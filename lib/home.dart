@@ -105,6 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 45,
                         child: ElevatedButton(
                           onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0), // Adjust the value as needed
+                            ),
+                          ),
                           child: const Text('Take (Online)', style: TextStyle(fontSize: 18),),
                         ),
                       ),
@@ -114,6 +119,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 45,
                         child: ElevatedButton(
                           onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0), // Adjust the value as needed
+                            ),
+                          ),
                           child: const Text('Sync To AX2012', style: TextStyle(fontSize: 18),),
                         ),
                       ),

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names
 
 import 'dart:convert';
 
@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:scannerapp/home.dart';
 import 'package:scannerapp/services/rest_api.dart';
+import 'package:scannerapp/utils/utility.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,6 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // ),
       body: Container(
         decoration: const BoxDecoration(
+          // color: Color(0xFF5D4037),
           image: DecorationImage(
             image: AssetImage('assets/images/bghome.jpg'),
             fit: BoxFit.fill,
@@ -138,31 +140,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       // แสดงค่า username และ password ที่เก็บไว้ในตัวแปร
                       // print('username: $username');
                       // print('password: $password');
-          
-                      // เรียกใช้งาน API Login เพื่อตรวจสอบ username และ password
-                      var response = await CallAPI().loginAPI(
-                        {
-                          'username': username,
-                          'password': password,
-                        }
-                      );
-          
-                      var body = jsonDecode(response.body);
-          
-                      // ถ้า username และ password ไม่ถูกต้องให้แสดง popup
-                      if (body['status'] == 'fail') {
+
+                      // เช็คว่ามีการเชื่อมต่อ Internet ไว้หรือไม่
+                      if(await Utility.getInstance()!.checkNetwork() == 'none') {
                         showDialog(
                           context: context,
                           builder: (context){
                             return AlertDialog(
                               title: const Text('มีข้อผิดพลาด'),
-                              content: const Text('username หรือ password ไม่ถูกต้อง'),
+                              content: const Text('ไม่มีการเชื่อมต่อ Internet'),
                               actions: [
                                 TextButton(
                                   onPressed: (){
                                     Navigator.pop(context);
-                                    // clear ค่าใน form
-                                    formLoginKey.currentState!.reset();
                                   }, 
                                   child: const Text('Close')
                                 ),
@@ -170,23 +160,56 @@ class _LoginScreenState extends State<LoginScreen> {
                             );
                           }
                         );
-                      } else {
-                
-                        // เก็บข้อมูลลง shared_preferences
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                
-                        // เก็บค่า username ลง shared_preferences
-                        await prefs.setString('pref_username', username);
-                
-                        // Login สำเร็จ ไปหน้า Home
-                        Navigator.pushReplacement(
-                          context, 
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen()
-                          ),
+                        return;
+                      } else {        
+                        // เรียกใช้งาน API Login เพื่อตรวจสอบ username และ password
+                        var response = await CallAPI().loginAPI(
+                          {
+                            'username': username,
+                            'password': password,
+                          }
                         );
-                
-                      }
+            
+                        var body = jsonDecode(response.body);
+            
+                        // ถ้า username และ password ไม่ถูกต้องให้แสดง popup
+                        if (body['status'] == 'fail') {
+                          showDialog(
+                            context: context,
+                            builder: (context){
+                              return AlertDialog(
+                                title: const Text('มีข้อผิดพลาด'),
+                                content: const Text('username หรือ password ไม่ถูกต้อง'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: (){
+                                      Navigator.pop(context);
+                                      // clear ค่าใน form
+                                      formLoginKey.currentState!.reset();
+                                    }, 
+                                    child: const Text('Close')
+                                  ),
+                                ],
+                              );
+                            }
+                          );
+                        } else {
+                  
+                          // เก็บข้อมูลลง shared_preferences
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                  
+                          // เก็บค่า username ลง shared_preferences
+                          await prefs.setString('pref_username', username);
+                  
+                          // Login สำเร็จ ไปหน้า Home
+                          Navigator.pushReplacement(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => const HomeScreen()
+                            ),
+                          );    
+                        }
+                      } // end else
                     }, 
                     child: const Text('LOGIN', style: TextStyle(fontSize: 20)),
                   ),

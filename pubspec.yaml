@@ -51,6 +51,9 @@ dependencies:
   # ไลบรารี่ไว้สำหรับเชื่อมต่อกับ api
   http: ^1.2.0
 
+  # ตรวจสอบสถานะการเชื่อมต่ออินเตอร์เน็ต
+  connectivity_plus: ^5.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
